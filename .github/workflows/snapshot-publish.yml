@@ -1,4 +1,4 @@
-name: Publish on Gradle Plugin Portal
+name: Publish Snapshots on Maven Central
 on:
   release:
     types: [ push ]
