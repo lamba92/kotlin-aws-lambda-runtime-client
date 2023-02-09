@@ -48,7 +48,7 @@ publishing {
             pom {
                 name.set(project.name)
                 url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client")
-                description.set(file("README.MD").readLines()[2])
+                description.set(file("README.md").readLines()[2])
                 licenses {
                     license {
                         name.set("APACHE LICENSE, VERSION 2.0")
