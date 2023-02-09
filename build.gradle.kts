@@ -13,7 +13,7 @@ plugins {
 val GITHUB_REF = System.getenv("GITHUB_REF")?.substringAfterLast("/")
 
 group = "com.github.lamba92"
-version = GITHUB_REF ?: "1.0-SNAPSHOT"
+version = GITHUB_REF ?: "0.0.1"
 
 fun getPrivateKey(): String? {
     val envVariable = System.getenv("GPG_SECRET_KEY") ?: return null
@@ -45,6 +45,27 @@ publishing {
             from(components["kotlin"])
             artifact(javadocJar)
             artifact(sourcesJar)
+            pom {
+                name.set(project.name)
+                url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client")
+                description.set(file("README.MD").readLines()[2])
+                licenses {
+                    license {
+                        name.set("APACHE LICENSE, VERSION 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client.git")
+                    tag.set(GITHUB_REF)
+                }
+                developers {
+                    developer {
+                        name.set("Lamberto Basti")
+                        email.set("basti.lamberto@gmail.com")
+                    }
+                }
+            }
         }
     }
 }

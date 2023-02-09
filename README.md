@@ -1,6 +1,6 @@
 # Kotlin runtime client for AWS Lambda
 
-This simple client is intended for replacing the Runtime Interface Clients (RIC) for Java. 
+Simple client intended for replacing the Runtime Interface Clients (RIC) for Java. 
 
 The main advantage is to be reflection free to make it easier to compile a native image using GraalVM.  
 

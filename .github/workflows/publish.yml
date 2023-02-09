@@ -22,4 +22,4 @@ jobs:
           SONATYPE_PASSWORD: ${{secrets.SONATYPE_PASSWORD}}
         with:
           gradle-version: wrapper
-          arguments: publish
+          arguments: publishToSonatype closeSonatypeStagingRepository
