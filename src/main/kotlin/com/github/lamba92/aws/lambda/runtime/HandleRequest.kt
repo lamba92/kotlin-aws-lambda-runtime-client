@@ -12,7 +12,7 @@ suspend inline fun <reified Input, reified Output> handleRequest(
     host: String = AWS_LAMBDA_RUNTIME_API,
     client: HttpClient = AWS_HTTP_CLIENT,
     function: (Input, AWSContext) -> Output
-): Nothing {
+) {
     while (true) {
         val (body, awsContext) = try {
             val r = client.get("http://$host/${endpoints.version}/${endpoints.nextInvocation}")

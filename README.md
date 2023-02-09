@@ -18,9 +18,8 @@ data class MyInput(val whatever: String)
 @Serializable
 data class MyOutput(val whateverOutput: Int)
 
-suspend fun main() {
+suspend fun main() = 
     handleRequest { input: MyInput, context: AWSContext -> MyOutput("Hello input: ${input.whatever}") }
-}
 ```
 
 Now use it as your main entry point in your custom runtime.

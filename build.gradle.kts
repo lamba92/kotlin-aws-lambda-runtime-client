@@ -17,7 +17,8 @@ version = GITHUB_REF ?: "1.0.0-SNAPSHOT"
 
 fun getAndCheckEnv(key: String): String? {
     val envVar = System.getenv(key)
-    if (envVar == null) logger.warn("Environment variable $key missing, publication is disabled")
+    if (envVar == null && System.getenv("CI") == "true")
+        logger.warn("Environment variable $key missing, publication is disabled")
     return envVar
 }
 
