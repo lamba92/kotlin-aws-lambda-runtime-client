@@ -63,7 +63,7 @@ publishing {
                 }
                 scm {
                     url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client.git")
-                    tag.set(GITHUB_REF)
+                    tag.set(project.version.toString())
                 }
                 developers {
                     developer {

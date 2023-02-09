@@ -6,6 +6,8 @@ The main advantage is to be reflection free to make it easier to compile a nativ
 
 ## Usage
 
+Artifact available at `com.github.lamba92:kotlin-aws-lambda-runtime-client:1.0.0`, see latest version for updates. 
+
 Write you main function like this:
 
 ```kotlin
