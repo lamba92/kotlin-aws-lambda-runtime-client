@@ -15,15 +15,21 @@ val GITHUB_REF = System.getenv("GITHUB_REF")?.substringAfterLast("/")
 group = "com.github.lamba92"
 version = GITHUB_REF ?: "1.0.0-SNAPSHOT"
 
+fun getAndCheckEnv(key: String): String? {
+    val envVar = System.getenv(key)
+    if (envVar == null) logger.warn("Environment variable $key missing, publication is disabled")
+    return envVar
+}
+
 fun getPrivateKey(): String? {
-    val envVariable = System.getenv("GPG_SECRET_KEY") ?: return null
+    val envVariable = getAndCheckEnv("GPG_SECRET_KEY") ?: return null
     return runCatching { Paths.get(envVariable).toFile().readText() }
         .getOrNull()
         ?:Base64.getDecoder().decode(envVariable).toString(Charsets.UTF_8)
 }
 
 signing {
-    useInMemoryPgpKeys(getPrivateKey(), System.getenv("GPG_SECRET_KEY_PASSWORD"))
+    useInMemoryPgpKeys(getPrivateKey(), getAndCheckEnv("GPG_SECRET_KEY_PASSWORD"))
     sign(publishing.publications)
 }
 
@@ -82,8 +88,8 @@ java {
 nexusPublishing {
     repositories {
         sonatype {
-            username.set(System.getenv("SONATYPE_USERNAME"))
-            password.set(System.getenv("SONATYPE_PASSWORD"))
+            username.set(getAndCheckEnv("SONATYPE_USERNAME"))
+            password.set(getAndCheckEnv("SONATYPE_PASSWORD"))
         }
     }
 }
