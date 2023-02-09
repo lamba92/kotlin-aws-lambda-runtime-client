@@ -13,7 +13,7 @@ plugins {
 val GITHUB_REF = System.getenv("GITHUB_REF")?.substringAfterLast("/")
 
 group = "com.github.lamba92"
-version = GITHUB_REF ?: "0.0.1"
+version = GITHUB_REF ?: "1.0.0-SNAPSHOT"
 
 fun getPrivateKey(): String? {
     val envVariable = System.getenv("GPG_SECRET_KEY") ?: return null
