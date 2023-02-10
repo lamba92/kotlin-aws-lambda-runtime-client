@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+data class RequestContext<Input>(val input: Input, val client: HttpClient, val awsContext: AWSContext)
 
 @Serializable
 data class ErrorResponse(

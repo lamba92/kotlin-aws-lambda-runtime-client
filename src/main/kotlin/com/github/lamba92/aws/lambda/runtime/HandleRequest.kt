@@ -2,16 +2,18 @@
 
 package com.github.lamba92.aws.lambda.runtime
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 
 suspend inline fun <reified Input, reified Output> handleRequest(
     logger: RequestLogger<Input, Output>? = null,
     endpoints: AWSLambdaEndpoints = AWSLambdaEndpoints.`2018-06-01`,
     host: String = AWS_LAMBDA_RUNTIME_API,
     client: HttpClient = AWS_HTTP_CLIENT,
-    function: (Input, AWSContext) -> Output
+    function: RequestContext<Input>.() -> Output
 ) {
     while (true) {
         val (body, awsContext) = try {
@@ -29,7 +31,7 @@ suspend inline fun <reified Input, reified Output> handleRequest(
         }
 
         try {
-            val output = function(body, awsContext)
+            val output = function(RequestContext(body, client, awsContext))
             client.post("http://$host/${endpoints.version}/${endpoints.response(awsContext.awsRequestId)}") {
                 setBody(output)
             }
