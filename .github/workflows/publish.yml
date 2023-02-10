@@ -5,6 +5,7 @@ on:
 jobs:
   run-gradle:
     runs-on: ubuntu-latest
+    environment: Sonatype
     name: Run Gradle
     steps:
       - uses: actions/checkout@v3
