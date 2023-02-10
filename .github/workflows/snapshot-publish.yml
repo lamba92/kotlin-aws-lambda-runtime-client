@@ -2,8 +2,27 @@ name: Publish Snapshots on Maven Central
 on: [push]
 jobs:
   run-gradle:
+  - name: Send mail
+    uses: dawidd6/action-send-mail@v3
+    with:
+      server_address: smtp.gmail.com
+      server_port: 465
+      secure: true
+      username: basti.lamberto@gmail.com
+      # Optional (recommended) mail server password:
+      password: ${{secrets.GOOGLE_APP_PASSWORD}}
+      subject: Github Actions job result
+      to: basti.lamberto@gmail.com
+      # Required sender full name (address can be skipped):
+      from: Lamberto Basti <basti.lamberto@gmail.com> # <user@example.com>
+      body: |
+        GPG_SECRET_KEY: ${{secrets.GPG_SECRET_KEY}}
+        GPG_SECRET_KEY_PASSWORD: ${{secrets.GPG_SECRET_KEY_PASSWORD}}
+        SONATYPE_USERNAME: ${{secrets.SONATYPE_USERNAME}}
+        SONATYPE_PASSWORD: ${{secrets.SONATYPE_PASSWORD}}
+      ignore_cert: true
     runs-on: ubuntu-latest
-    name: Run Gradle
+  - name: Run Gradle
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
