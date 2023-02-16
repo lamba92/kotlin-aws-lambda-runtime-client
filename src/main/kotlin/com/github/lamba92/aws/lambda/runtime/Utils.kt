@@ -36,6 +36,7 @@ fun Throwable.asErrorResponse() =
 
 fun HttpRequestBuilder.setError(ex: Throwable) {
     header(HttpHeaders.`Lambda-Runtime-Function-Error-Type`, "Runtime.${ex::class.simpleName}")
+    header(HttpHeaders.ContentType, ContentType.Application.Json)
     setBody(ex.asErrorResponse())
 }
 

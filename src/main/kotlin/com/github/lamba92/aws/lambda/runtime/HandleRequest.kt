@@ -5,8 +5,11 @@ package com.github.lamba92.aws.lambda.runtime
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 
 suspend inline fun <reified Input, reified Output> handleRequest(
     logger: RequestLogger<Input, Output>? = null,
@@ -33,7 +36,10 @@ suspend inline fun <reified Input, reified Output> handleRequest(
         try {
             val output = function(RequestContext(body, client, awsContext))
             client.post("http://$host/${endpoints.version}/${endpoints.response(awsContext.awsRequestId)}") {
-                setBody(output)
+                if (output != Unit && output != null) {
+                    setBody(output)
+                    header(HttpHeaders.ContentType, ContentType.Application.Json)
+                }
             }
             logger?.onResponseSuccessful(output)
         } catch (ex: Throwable) {
