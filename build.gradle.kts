@@ -10,10 +10,12 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
-val GITHUB_REF = System.getenv("GITHUB_REF")?.substringAfterLast("/")
+val GIT_TAG = System.getenv("GITHUB_REF")
+    ?.takeIf { it.startsWith("refs/tags/") }
+    ?.substringAfterLast("/")
 
 group = "com.github.lamba92"
-version = GITHUB_REF ?: "1.0.0-SNAPSHOT"
+version = GIT_TAG ?: "1.0.0-SNAPSHOT"
 
 fun getAndCheckEnv(key: String): String? {
     val envVar = System.getenv(key)
