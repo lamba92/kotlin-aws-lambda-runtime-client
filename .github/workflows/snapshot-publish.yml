@@ -1,5 +1,8 @@
 name: Publish Snapshots on Maven Central
-on: [ push ]
+on:
+  push:
+    branches:
+      - main
 jobs:
   run-gradle:
     runs-on: ubuntu-latest
