@@ -41,7 +41,8 @@ signing {
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier = "javadoc"
     from(tasks.dokkaHtml)
-    into(layout.buildDirectory.dir("artifacts"))
+    destinationDirectory = layout.buildDirectory.dir("artifacts")
+    archiveBaseName = project.name
 }
 
 kotlin {
