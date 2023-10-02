@@ -40,7 +40,7 @@ signing {
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier = "javadoc"
-    from(tasks.dokkaJavadoc)
+    from(tasks.dokkaHtml)
     into(layout.buildDirectory.dir("artifacts"))
 }
 
