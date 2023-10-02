@@ -1,5 +1,5 @@
-import java.util.Base64
 import java.nio.file.Paths
+import java.util.*
 
 plugins {
     kotlin("multiplatform") version "1.9.10"
@@ -40,6 +40,7 @@ kotlin {
     jvm()
     js {
         nodejs()
+        useEsModules()
     }
     linuxX64()
 
