@@ -13,27 +13,26 @@ import io.ktor.http.HttpHeaders
 
 suspend inline fun <reified Input, reified Output> handleRequest(
     logger: RequestLogger<Input, Output>? = null,
-    endpoints: AWSLambdaEndpoints = AWSLambdaEndpoints.`2018-06-01`,
+    endpoints: AWSLambdaEndpoints = AWSLambdaEndpoints.v2018_06_01,
     host: String = AWS_LAMBDA_RUNTIME_API,
     client: HttpClient = AWS_HTTP_CLIENT,
     function: RequestContext<Input>.() -> Output
 ) {
     while (true) {
-        val (body, awsContext) = try {
-            val r = client.get("http://$host/${endpoints.version}/${endpoints.nextInvocation}")
-            val body = r.body<Input>()
-            val awsContext = r.getAWSHeaders()
-            logger?.onNextInvocationSuccessful(body, awsContext)
-            body to awsContext
+        val response = try {
+            client.get("http://$host/${endpoints.version}/${endpoints.nextInvocation}")
         } catch (ex: Throwable) {
-            client.post("http://$host/${endpoints.version}/${endpoints.nextInvocationError}") {
+            val errorRequest = client.post("http://$host/${endpoints.version}/${endpoints.nextInvocationError}") {
                 setError(ex)
             }
-            logger?.onNextInvocationFailed(ex)
+            val errorBody = runCatching { errorRequest.body<ErrorResponse>() }.getOrNull()
+            logger?.onNextInvocationFailed(ex, errorBody)
             continue
         }
-
+        val awsContext = response.getAWSHeaders()
         try {
+            val body = response.body<Input>()
+            logger?.onNextInvocationSuccessful(body, awsContext)
             val output = function(RequestContext(body, client, awsContext))
             client.post("http://$host/${endpoints.version}/${endpoints.response(awsContext.awsRequestId)}") {
                 if (output != Unit && output != null) {
@@ -43,10 +42,12 @@ suspend inline fun <reified Input, reified Output> handleRequest(
             }
             logger?.onResponseSuccessful(output)
         } catch (ex: Throwable) {
-            client.post("http://$host/${endpoints.version}/${endpoints.responseError(awsContext.awsRequestId)}") {
-                setError(ex)
-            }
-            logger?.onResponseFailed(ex)
+            val errorRequest =
+                client.post("http://$host/${endpoints.version}/${endpoints.responseError(awsContext.awsRequestId)}") {
+                    setError(ex)
+                }
+            val errorBody = runCatching { errorRequest.body<ErrorResponse>() }.getOrNull()
+            logger?.onResponseFailed(ex, errorBody)
         }
     }
 }

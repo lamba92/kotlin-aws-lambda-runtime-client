@@ -5,5 +5,6 @@ rootProject.name = "kotlin-aws-lambda-runtime-client"
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        jcenter()
     }
 }

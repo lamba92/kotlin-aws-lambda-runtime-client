@@ -5,7 +5,7 @@ package com.github.lamba92.aws.lambda.runtime
 interface AWSLambdaEndpoints {
 
     companion object {
-        val `2018-06-01`= object : AWSLambdaEndpoints {
+        val v2018_06_01= object : AWSLambdaEndpoints {
             override val version = "2018-06-01"
             override val nextInvocation= "runtime/invocation/next"
             override val nextInvocationError = "runtime/init/error"

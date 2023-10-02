@@ -2,9 +2,9 @@ import java.util.Base64
 import java.nio.file.Paths
 
 plugins {
-    kotlin("jvm") version "1.8.10"
-    kotlin("plugin.serialization") version "1.8.10"
-    id("org.jetbrains.dokka") version "1.7.20"
+    kotlin("multiplatform") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
+    id("org.jetbrains.dokka") version "1.9.0"
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
@@ -28,7 +28,7 @@ fun getPrivateKey(): String? {
     val envVariable = getAndCheckEnv("GPG_SECRET_KEY") ?: return null
     return runCatching { Paths.get(envVariable).toFile().readText() }
         .getOrNull()
-        ?:Base64.getDecoder().decode(envVariable).toString(Charsets.UTF_8)
+        ?: Base64.getDecoder().decode(envVariable).toString(Charsets.UTF_8)
 }
 
 signing {
@@ -36,24 +36,44 @@ signing {
     sign(publishing.publications)
 }
 
-val javadocJar by tasks.creating(Jar::class) {
-    from(tasks.dokkaJavadoc)
-    archiveBaseName.set("javadoc")
-    archiveClassifier.set("javadoc")
-}
+kotlin {
+    jvm()
+    js {
+        nodejs()
+    }
+    linuxX64()
 
-val sourcesJar by tasks.creating(Jar::class) {
-    from(kotlin.sourceSets.main.get().kotlin)
-    archiveBaseName.set("sources")
-    archiveClassifier.set("sources")
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api("io.ktor:ktor-client-content-negotiation:2.3.4")
+                api("io.ktor:ktor-client-logging:2.3.4")
+                api("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                api("io.ktor:ktor-client-cio:2.3.4")
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                api("io.ktor:ktor-client-js:2.3.4")
+                api("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
+            }
+        }
+        val linuxX64Main by getting {
+            dependencies {
+                api("io.ktor:ktor-client-curl:2.3.4")
+            }
+        }
+    }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("main") {
-            from(components["kotlin"])
-            artifact(javadocJar)
-            artifact(sourcesJar)
+        withType<MavenPublication> {
             pom {
                 name.set(project.name)
                 url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client")
@@ -79,15 +99,6 @@ publishing {
     }
 }
 
-kotlin.target.compilations.all {
-    kotlinOptions.jvmTarget = "11"
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 nexusPublishing {
     repositories {
         sonatype {
@@ -95,12 +106,4 @@ nexusPublishing {
             password.set(getAndCheckEnv("SONATYPE_PASSWORD"))
         }
     }
-}
-
-dependencies {
-    api("io.ktor:ktor-client-cio:2.2.3")
-    api("io.ktor:ktor-client-content-negotiation:2.2.3")
-    api("io.ktor:ktor-client-logging:2.2.3")
-    api("io.ktor:ktor-serialization-kotlinx-json:2.2.3")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
 }
