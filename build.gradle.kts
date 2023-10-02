@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import java.nio.file.Paths
 import java.util.*
 
@@ -34,6 +36,12 @@ fun getPrivateKey(): String? {
 signing {
     useInMemoryPgpKeys(getPrivateKey(), getAndCheckEnv("GPG_SECRET_KEY_PASSWORD"))
     sign(publishing.publications)
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier = "javadoc"
+    from(tasks.dokkaJavadoc)
+    into(layout.buildDirectory.dir("artifacts"))
 }
 
 kotlin {
@@ -75,6 +83,7 @@ kotlin {
 publishing {
     publications {
         withType<MavenPublication> {
+            artifact(javadocJar)
             pom {
                 name.set(project.name)
                 url.set("https://github.com/lamba92/kotlin-aws-lambda-runtime-client")
